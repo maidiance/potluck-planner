@@ -7,10 +7,10 @@
     "migrate:dev": "knex migrate:latest",
     "rollback:dev": "knex migrate:rollback",
     "seed:dev": "knex seed:run",
-    "migrate:prod": "heroku run knex migrate:latest -a YOUR_HEROKU_APP_NAME",
-    "rollback:prod": "heroku run knex migrate:rollback -a YOUR_HEROKU_APP_NAME",
-    "database:prod": "heroku pg:psql -a YOUR_HEROKU_APP_NAME",
-    "seed:prod": "heroku run knex seed:run -a YOUR_HEROKU_APP_NAME",
+    "migrate:prod": "heroku run knex migrate:latest -a bloomtech-potluck",
+    "rollback:prod": "heroku run knex migrate:rollback -a bloomtech-potluck",
+    "database:prod": "heroku pg:psql -a bloomtech-potluck",
+    "seed:prod": "heroku run knex seed:run -a bloomtech-potluck",
     "test": "cross-env NODE_ENV=testing jest --verbose --runInBand",
     "deploy": "git push heroku main"
   },
@@ -23,7 +23,7 @@
     "dotenv": "14.3.0",
     "express": "4.17.2",
     "helmet": "5.0.2",
-    "knex": "1.0.1",
+    "knex": "^1.0.1",
     "knex-cleaner": "1.3.1",
     "pg": "8.7.1"
   },
