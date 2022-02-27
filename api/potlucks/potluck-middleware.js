@@ -1,11 +1,11 @@
 const Potlucks = require('./potluck-model');
 
-function validateId(req, res, next) {
+const validateId = (req, res, next) => {
     const id = req.params.id;
     Potlucks.findById(id)
         .then(potluck => {
             if(!potluck) {
-                res.status(404).json({message: `potluck ${id} not found`);
+                res.status(404).json({message: `potluck ${id} not found`});
             } else {
                 req.potluck = potluck;
                 next();
@@ -16,7 +16,7 @@ function validateId(req, res, next) {
         })
 }
 
-function validatePotluck(req, res, next) {
+const validatePotluck = (req, res, next) => {
     const potluck = req.body;
     if(!potluck) {
         res.status(500).json({message: 'missing required body'});
@@ -27,7 +27,7 @@ function validatePotluck(req, res, next) {
     }
 }
 
-function validateItem(req, res, next) {
+const validateItem = (req, res, next) => {
     if(!req.body.name){
         res.status(400).json({message: 'missing required name'});
     } else {
@@ -35,7 +35,7 @@ function validateItem(req, res, next) {
     }
 }
 
-modules.export = {
+module.export = {
     validateId,
     validatePotluck,
     validateItem

@@ -5,18 +5,18 @@ const { validateId, validatePotluck, validateItem } = require('./potluck-middlew
 router.get('/', (req, res) => {
     Potluck.find()
         .then(potlucks => {
-            res.status(200).json(potlucks)
+            res.status(200).json(potlucks);
         })
         .catch(() => {
             res.status(500).json({message: 'could not get potlucks'});
         })
 });
 
-router.get('/:id', validateId, (req, res) => {
+router.get('/:id', (req, res) => {
     res.json(req.potluck);
 });
 
-router.post('/', validatePotluck, (req, res) => {
+router.post('/', (req, res) => {
     Potluck.insert(req.body)
         .then(potluck => {
             res.status(201).json(potluck);
@@ -26,7 +26,7 @@ router.post('/', validatePotluck, (req, res) => {
         })
 });
 
-router.put('/:id', validateId, validatePotluck, (req, res) => {
+router.put('/:id', (req, res) => {
     Potluck.update(req.params.id, req.body)
         .then(potluck => {
             res.status(200).json(potluck);
@@ -36,7 +36,7 @@ router.put('/:id', validateId, validatePotluck, (req, res) => {
         })
 });
 
-router.delete('/:id', validateId, (req, res) => {
+router.delete('/:id', (req, res) => {
     Potluck.delete(req.params.id)
         .then(potluck => {
             res.status(200).json(potluck);
@@ -46,7 +46,7 @@ router.delete('/:id', validateId, (req, res) => {
         })
 });
 
-router.get('/:id/items', validateId, (req, res) => {
+router.get('/:id/items', (req, res) => {
     const { id } = req.params;
     Potluck.findItems(id)
         .then(items => {
@@ -57,7 +57,7 @@ router.get('/:id/items', validateId, (req, res) => {
         })
 });
 
-router.post('/:id/items', validateId, validateItem, (req, res) => {
+router.post('/:id/items', (req, res) => {
     const { id } = req.params;
     Potluck.insertItem(id, req.body)
         .them(item => {
