@@ -12,11 +12,11 @@ router.get('/', (req, res) => {
         })
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', validateId, (req, res) => {
     res.json(req.potluck);
 });
 
-router.post('/', (req, res) => {
+router.post('/', validatePotluck, (req, res) => {
     Potluck.insert(req.body)
         .then(potluck => {
             res.status(201).json(potluck);
@@ -26,7 +26,7 @@ router.post('/', (req, res) => {
         })
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', validateId, (req, res) => {
     Potluck.update(req.params.id, req.body)
         .then(potluck => {
             res.status(200).json(potluck);
@@ -36,7 +36,7 @@ router.put('/:id', (req, res) => {
         })
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validateId, (req, res) => {
     Potluck.delete(req.params.id)
         .then(potluck => {
             res.status(200).json(potluck);
@@ -46,7 +46,7 @@ router.delete('/:id', (req, res) => {
         })
 });
 
-router.get('/:id/items', (req, res) => {
+router.get('/:id/items', validateId, (req, res) => {
     const { id } = req.params;
     Potluck.findItems(id)
         .then(items => {
@@ -57,7 +57,7 @@ router.get('/:id/items', (req, res) => {
         })
 });
 
-router.post('/:id/items', (req, res) => {
+router.post('/:id/items', validateId, validateItem, (req, res) => {
     const { id } = req.params;
     Potluck.insertItem(id, req.body)
         .them(item => {

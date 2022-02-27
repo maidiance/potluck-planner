@@ -35,7 +35,7 @@ const validateItem = (req, res, next) => {
     }
 }
 
-module.export = {
+module.exports = {
     validateId,
     validatePotluck,
     validateItem
