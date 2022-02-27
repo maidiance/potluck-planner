@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const Potluck = require('./potluck-model');
-const { validateId, validatePotluck } = require('./potluck-middleware');
+const { validateId, validatePotluck, validateItem } = require('./potluck-middleware');
 
 router.get('/', (req, res) => {
     Potluck.find()
@@ -47,7 +47,25 @@ router.delete('/:id', validateId, (req, res) => {
 });
 
 router.get('/:id/items', validateId, (req, res) => {
-    
+    const { id } = req.params;
+    Potluck.findItems(id)
+        .then(items => {
+            res.status(200).json(items);
+        })
+        .catch(() => {
+            res.status(500).json({message: 'could not get items'});
+        })
+});
+
+router.post('/:id/items', validateId, validateItem, (req, res) => {
+    const { id } = req.params;
+    Potluck.insertItem(id, req.body)
+        .them(item => {
+            res.status(201).json(item);
+        })
+        .catch(() => {
+            res.status(500).json({message: 'could not post item'});
+        })
 });
 
 module.exports = router;

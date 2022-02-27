@@ -12,7 +12,7 @@ function validateId(req, res, next) {
             }
         })
         .catch(() => {
-            res.status(500).json({message: 'could not findById'});
+            res.status(500).json({message: 'could not Potlucks.findById'});
         })
 }
 
@@ -27,7 +27,16 @@ function validatePotluck(req, res, next) {
     }
 }
 
+function validateItem(req, res, next) {
+    if(!req.body.name){
+        res.status(400).json({message: 'missing required name'});
+    } else {
+        next();
+    }
+}
+
 modules.export = {
     validateId,
-    validatePotluck
+    validatePotluck,
+    validateItem
 }

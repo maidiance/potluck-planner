@@ -6,7 +6,9 @@ module.exports = {
     insert,
     update,
     remove,
-    getPotluckItems
+    findItems,
+    insertItem,
+    updateItem
 };
 
 function find() {
@@ -43,9 +45,42 @@ async function remove(id) {
     return result;
 }
 
-function getPotluckItems(id) {
+function findItems(potluck_id) {
     return db('org as o')
-        .join('items as i', 'i.item_id', 'p.id')
+        .join('items as i', 'i.item_id', 'p.pid')
         .select('i.name')
-        .where('p.id', id)
+        .where('p.pid', potluck_id);
+}
+
+function findItemById(potluck_id) {
+    return db('items')
+        .where('item_id', potluck_id);
+}
+
+async function insertItem(potluck_id, item) {
+    const toInsert = {
+        pid: potluck_id,
+        item_id: item.item_id
+    };
+    await db('org')
+        .insert(toInsert)
+        .where('pid', potluck_id)
+    return db('items')
+        .insert(item)
+        .then(([id]) => {
+            return findItemById(id);
+        })
+}
+
+async function updateItem(item_id, changes) {
+    await db('items')
+        .update(changes)
+        .where('item_id', item_id);
+    return findItemById(item_id);
+}
+
+async function removeItem(item_id) {
+    const result = await findItemById(item_id);
+    await db('items').where('item_id', item_id).del();
+    return result;
 }
