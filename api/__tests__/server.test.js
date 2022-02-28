@@ -288,5 +288,39 @@ describe('test items endpoints', () => {
       expect(items).toHaveLength(1);
       expect(items[0].name).toBe('chips');
     });
+
+    test('responds with correct status and message sad path', async() => {
+      let result = await request(server)
+        .get('/api/potluck/13/items');
+      expect(result.status).toBe(404);
+      expect(result.body.message).toMatch(/potluck 13 not found/i);
+    });
+  });
+
+  describe('[PUT] /:id/items/:item_id', () => {
+    test('responds with correct status and body happy path', async() => {
+      let result = await request(server)
+        .put('/api/potluck/3/items/5')
+        .send({name: 'foobar'});
+      expect(result.status).toBe(200);
+      let item = result.body;
+      expect(item.name).toBe('foobar');
+    });
+
+    test('responds with correct status and message sad path', async() => {
+      let result = await request(server)
+        .put('/api/potluck/3/items/15')
+        .send({name: 'none'});
+      expect(result.status).toBe(404);
+      expect(result.body.message).toMatch(/item 15 not found/i);
+    });
+
+    test('responds with correct status and message with bad body', async() => {
+      let result = await request(server)
+        .put('/api/potluck/3/items/5')
+        .send({name: ''});
+      expect(result.status).toBe(400);
+      expect(result.body.message).toMatch(/missing required name/i);
+    });
   });
 });

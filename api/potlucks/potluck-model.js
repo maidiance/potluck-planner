@@ -8,6 +8,7 @@ module.exports = {
     update,
     remove,
     findItems,
+    findItemById,
     insertItem,
     updateItem,
     removeItem

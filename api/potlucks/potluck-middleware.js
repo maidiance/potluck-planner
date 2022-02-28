@@ -12,7 +12,7 @@ const validateId = (req, res, next) => {
             }
         })
         .catch(() => {
-            res.status(500).json({message: 'could not Potlucks.findById'});
+            res.status(500).json({message: 'could not validate potluck id'});
         })
 }
 
@@ -27,8 +27,23 @@ const validatePotluck = (req, res, next) => {
     }
 }
 
+const validateItemId = (req, res, next) => {
+    const id = req.params.item_id;
+    Potlucks.findItemById(id)
+        .then(item => {
+            if(item == null) {
+                res.status(404).json({message: `item ${id} not found`});
+            } else {
+                next();
+            }
+        })
+        .catch(() => {
+            res.status(500).json({message: 'could not validate item id'});
+        })
+}
+
 const validateItem = (req, res, next) => {
-    if(!req.body.name){
+    if(!req.body.name || !req.body.name.trim()){
         res.status(400).json({message: 'missing required name'});
     } else {
         next();
@@ -38,5 +53,6 @@ const validateItem = (req, res, next) => {
 module.exports = {
     validateId,
     validatePotluck,
+    validateItemId,
     validateItem
 }
