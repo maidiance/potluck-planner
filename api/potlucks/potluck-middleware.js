@@ -4,10 +4,10 @@ const validateId = (req, res, next) => {
     const id = req.params.id;
     Potlucks.findById(id)
         .then(potluck => {
-            if(!potluck) {
+            if(potluck.length < 1) {
                 res.status(404).json({message: `potluck ${id} not found`});
             } else {
-                req.potluck = potluck;
+                req.potluck = potluck[0];
                 next();
             }
         })

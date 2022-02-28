@@ -65,7 +65,7 @@ describe('test Potluck model', () => {
 });
 
 describe('test users endpoints', () => {
-  describe('[POSt] /api/users/register', () => {
+  describe('[POST] /api/users/register', () => {
     test('responds with a correct status and user is added to database', async() => {
       let result = await request(server)
         .post('/api/users/register')
@@ -111,6 +111,37 @@ describe('test users endpoints', () => {
         .send({ username: 'Captain Marvel', password: 'foobar' });
       expect(result.status).toBe(200);
       expect(result.body.message).toMatch(/welcome Captain Marvel/i);
+    });
+  });
+});
+
+describe('test potluck endpoints', () => {
+  describe('[GET] /api/potluck', () => {
+    test('responds with correct status and body', async() => {
+      let result = await request(server)
+        .get('/api/potluck');
+      expect(result.status).toBe(200);
+      expect(result.body).toHaveLength(1);
+    });
+  });
+
+  describe('[GET] /api/potluck/:id', () => {
+    test('responds with correct status and body with good id', async() => {
+      let result = await request(server)
+        .get('/api/potluck/2');
+      expect(result.status).toBe(200);
+      let potluck = result.body;      
+      expect(potluck.name).toBe('bloom potluck');
+      expect(potluck.date).toBe('feb 2');
+      expect(potluck.time).toBe('2pm');
+      expect(potluck.location).toBe('2nd cherry st');
+    });
+
+    test('responds with correct status and body with bad id', async() => {
+      let result = await request(server)
+        .get('/api/potluck/3');
+      expect(result.status).toBe(404);
+      expect(result.body.message).toMatch(/potluck 3 not found/i);
     });
   });
 });
