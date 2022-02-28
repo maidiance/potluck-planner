@@ -70,7 +70,27 @@ describe('test Potluck model', () => {
 
   test('can get items by potluck id', async() => {
     let result = await Potluck.findItems(2);
+    expect(result.length).toBe(1);
+    expect(result[0].name).toBe('salsa');
   });
+
+  test('can get items after multiple inserts', async() => {
+    await Potluck.insertItem(2, {name: 'chips'});
+    await Potluck.insertItem(2, {name: 'pizza'});
+    await Potluck.insertItem(2, {name: 'drinks'});
+    let result = await Potluck.findItems(2);
+    expect(result.length).toBe(4);
+  });
+
+  test('can update item name', async() => {
+    let result = await Potluck.updateItem(1, {name: 'dip'});
+    expect(result.name).toBe('dip');
+  });
+
+  test('can update responsible', async() => {
+    let result = await Potluck.updateItem(1, {responsible: 1});
+    expect(result.responsible).toBe(1);
+  })
 });
 
 describe('test users endpoints', () => {

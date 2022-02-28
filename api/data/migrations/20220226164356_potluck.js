@@ -19,7 +19,9 @@ exports.up = function(knex) {
         .createTable('items', tbl => {
             tbl.increments('item_id');
             tbl.string('name').notNullable();
-            tbl.integer('responsible');
+            tbl.integer('responsible')
+                .references('user_id')
+                .inTable('users');
         })
         .createTable('org', tbl => {
             tbl.integer('pid')
