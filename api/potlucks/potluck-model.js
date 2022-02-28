@@ -3,6 +3,7 @@ const db = require('../data/db-config');
 module.exports = {
     find,
     findById,
+    findByUser,
     insert,
     update,
     remove,
@@ -14,29 +15,34 @@ module.exports = {
 function find() {
     return db('potluck as p')
         .leftJoin('users as u', 'u.user_id', 'p.user_id')
-        .select('u.user_id', 'username', 'name', 'date', 'time', 'location');
+        .select('p.pid', 'u.user_id', 'username', 'name', 'date', 'time', 'location');
 }
 
-function findById(id) {
+function findById(potluck_id) {
+    return db('potluck as p')
+        .leftJoin('users as u', 'u.user_id', 'p.user_id')
+        .select('p.pid', 'u.user_id', 'username', 'name', 'date', 'time', 'location')
+        .where('p.pid', potluck_id);
+}
+
+function findByUser(user_id) {
     return db('potluck as p')
         .leftJoin('users as u', 'u.user_id', 'p.user_id')
         .select('u.user_id', 'username', 'name', 'date', 'time', 'location')
-        .where({ user_id : id });
+        .where('p.user_id', user_id);
 }
 
-function insert(potluck) {
-    return db('potluck')
-        .insert(potluck)
-        .then(([id]) => {
-            return findById(id);
-        })
+async function insert(potluck) {
+    const [newPotluck] = await db('potluck').insert(potluck, ['pid', 'name', 'date', 'time', 'location']);
+    return newPotluck;
 }
 
-async function update(id, changes) {
+async function update(potluck_id, changes) {
     await db('potluck')
         .update(changes)
-        .where('pid', id)
-    return findById(id);
+        .where('pid', potluck_id);
+    let [result] = await findById(potluck_id);
+    return result;
 }
 
 async function remove(id) {

@@ -2,6 +2,7 @@ const request = require('supertest');
 const server = require('../server');
 const db = require('./../data/db-config');
 const Users = require('./../users/user-model');
+const Potluck = require('./../potlucks/potluck-model');
 
 beforeAll(async () => {
   await db.migrate.rollback();
@@ -34,6 +35,27 @@ describe('test User model', () => {
   });
 });
 
+describe('test Potluck model', () => {
+  test('can find a potluck by id', async() => {
+    await db('potluck').insert({name: 'bobs potluck', date: 'jan 1', time: '1pm', location: '3rd apple ln', user_id: 2});
+    let [result] = await Potluck.findById(1);
+    expect(result.name).toBe('bobs potluck');
+  });
+
+  test('can insert potluck', async() => {
+    let result = await Potluck.insert({name: 'bloom potluck', date: 'feb 2', time: '2pm', location: '2nd cherry st', user_id: 3});
+    expect(result.name).toBe('bloom potluck');
+  });
+
+  test('can update potluck', async() => {
+    let result = await Potluck.update(1, {name: 'bobs birthday'});
+    expect(result.name).toBe('bobs birthday');
+    expect(result.date).toBe('jan 1');
+    expect(result.time).toBe('1pm');
+    expect(result.location).toBe('3rd apple ln');
+  });
+});
+
 describe('test users endpoints', () => {
   describe('[POSt] /api/users/register', () => {
     test('responds with a correct status and user is added to database', async() => {
@@ -60,6 +82,27 @@ describe('test users endpoints', () => {
         .send({username: 'foobar'});
       expect(result.status).toBe(400);
       expect(result.body.message).toMatch(/password required/i);
+    });
+  });
+
+  describe('[POST] /api/auth/login', () => {
+    test('responds with correct status and message on invalid credentials', async() => {
+      let result = await request(server)
+        .post('/api/users/login')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
+      expect(result.status).toBe(401);
+      expect(result.body.message).toMatch(/invalid user/i);
+    });
+
+    test('responds with correct status and message on valid credentials', async() => {
+      let result = await request(server)
+        .post('/api/users/register')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
+      result = await request(server)
+        .post('/api/users/login')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
+      expect(result.status).toBe(200);
+      expect(result.body.message).toMatch(/welcome Captain Marvel/i);
     });
   });
 });

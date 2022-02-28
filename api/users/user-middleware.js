@@ -14,8 +14,9 @@ function validateUser (req, res, next) {
 async function validateUsername (req, res, next) {
     const username = req.body.username;
     const user = await Users.findBy({username});
-    if(user == null) {
+    if(user == null || user.length < 1) {
         res.status(401).json({message: 'invalid user'});
+        res.end();
     } else {
         req.user = user;
         next();

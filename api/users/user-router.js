@@ -15,7 +15,7 @@ router.post('/register', validateUser, async (req, res) => {
 
 router.post('/login', validateUser, validateUsername, (req, res) => {
     const request = req.body.password;
-    const user = req.user;
+    const [user] = req.user;
     if(bcrypt.compareSync(request, user.password)) {
         const token = generateToken(user);
         res.status(200).json({
