@@ -54,6 +54,14 @@ describe('test Potluck model', () => {
     expect(result.time).toBe('1pm');
     expect(result.location).toBe('3rd apple ln');
   });
+
+  test('can delete potluck', async() => {
+    let [result] = await Potluck.remove(1);
+    expect(result.name).toBe('bobs birthday');
+    expect(result.date).toBe('jan 1');
+    expect(result.time).toBe('1pm');
+    expect(result.location).toBe('3rd apple ln');
+  });
 });
 
 describe('test users endpoints', () => {
