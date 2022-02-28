@@ -18,7 +18,7 @@ exports.up = function(knex) {
         })
         .createTable('items', tbl => {
             tbl.increments('item_id');
-            tbl.string('name').notNullable();
+            tbl.string('name', 128).notNullable();
             tbl.integer('responsible')
                 .references('user_id')
                 .inTable('users');

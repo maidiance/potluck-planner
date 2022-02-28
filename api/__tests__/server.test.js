@@ -106,6 +106,7 @@ describe('test users endpoints', () => {
         .send({username: 'leaf', password: 'spring'});
       expect(result.status).toBe(201);
       result = await Users.findById(5);
+      expect(result.user_id).toBe(5);
       expect(result.username).toBe('leaf');
       expect(result.password).not.toBe('spring');
     });
@@ -145,6 +146,7 @@ describe('test users endpoints', () => {
         .send({ username: 'Captain Marvel', password: 'foobar' });
       expect(result.status).toBe(200);
       expect(result.body.message).toMatch(/welcome Captain Marvel/i);
+      expect(result.body.token).not.toBeNull();
     });
   });
 });
@@ -164,7 +166,8 @@ describe('test potluck endpoints', () => {
       let result = await request(server)
         .get('/api/potluck/2');
       expect(result.status).toBe(200);
-      let potluck = result.body;      
+      let potluck = result.body;
+      expect(potluck.pid).toBe(2);
       expect(potluck.name).toBe('bloom potluck');
       expect(potluck.date).toBe('feb 2');
       expect(potluck.time).toBe('2pm');
@@ -186,6 +189,7 @@ describe('test potluck endpoints', () => {
         .send({name: 'bobs potluck', date: 'jan 1', time: '1pm', location: '3rd apple ln', user_id: 2});
       expect(result.status).toBe(201);
       let potluck = result.body;
+      expect(potluck.pid).toBe(3);
       expect(potluck.name).toBe('bobs potluck');
       expect(potluck.date).toBe('jan 1');
       expect(potluck.time).toBe('1pm');
@@ -207,6 +211,7 @@ describe('test potluck endpoints', () => {
         .put('/api/potluck/2')
         .send({name: 'bobs birthday'});
       let potluck = result.body;
+      expect(potluck.pid).toBe(2);
       expect(potluck.name).toBe('bobs birthday');
       expect(potluck.date).toBe('feb 2');
       expect(potluck.time).toBe('2pm');
@@ -236,6 +241,7 @@ describe('test potluck endpoints', () => {
         .del('/api/potluck/2');
       expect(result.status).toBe(200);
       let potluck = result.body;
+      expect(potluck.pid).toBe(2);
       expect(potluck.name).toBe('bobs birthday');
       expect(potluck.date).toBe('feb 2');
       expect(potluck.time).toBe('2pm');
@@ -259,6 +265,7 @@ describe('test items endpoints', () => {
         .send({name: 'chips'});
       expect(result.status).toBe(201);
       let item = result.body;
+      expect(item.item_id).toBe(5);
       expect(item.name).toBe('chips');
     });
 
@@ -304,6 +311,7 @@ describe('test items endpoints', () => {
         .send({name: 'foobar'});
       expect(result.status).toBe(200);
       let item = result.body;
+      expect(item.item_id).toBe(5);
       expect(item.name).toBe('foobar');
     });
 
@@ -330,7 +338,7 @@ describe('test items endpoints', () => {
       expect(result.status).toBe(200);
       let item = result.body;
       expect(item.responsible).toBe(2);
-    })
+    });
 
     test('responds correctly when invalid update responsible user', async() => {
       let result = await request(server)
@@ -338,7 +346,7 @@ describe('test items endpoints', () => {
         .send({name: 'none', responsible: 13});
       expect(result.status).toBe(400);
       expect(result.body.message).toMatch(/invalid user/i);
-    })
+    });
   });
 
   describe('[DELETE] /:id/items/:item_id', () => {

@@ -23,6 +23,8 @@ const validatePotluck = (req, res, next) => {
         res.status(400).json({message: 'missing required body'});
     } else if (!potluck.name || !potluck.name.trim()) {
         res.status(400).json({message: 'missing required name'});
+    } else if (potluck.name.length >= 128){
+        res.status(400).json({message: 'name too long'});
     } else {
         next();
     }
@@ -46,6 +48,8 @@ const validateItemId = (req, res, next) => {
 const validateItem = async (req, res, next) => {
     if(!req.body.name || !req.body.name.trim()){
         res.status(400).json({message: 'missing required name'});
+    } else if(req.body.name.length >= 128) {
+        res.status(400).json({message: 'name too long'});
     } else if(req.body.responsible != null) {
         const result = await Users.findById(req.body.responsible);
         if(!result) {
