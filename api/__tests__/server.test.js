@@ -144,4 +144,26 @@ describe('test potluck endpoints', () => {
       expect(result.body.message).toMatch(/potluck 3 not found/i);
     });
   });
+
+  describe('[POST] /api/potluck/', () => {
+    test('responds with correct status and body happy path', async() => {
+      let result = await request(server)
+      .post('/api/potluck')
+      .send({name: 'bobs potluck', date: 'jan 1', time: '1pm', location: '3rd apple ln', user_id: 2});
+      expect(result.status).toBe(201);
+      let potluck = result.body;
+      expect(potluck.name).toBe('bobs potluck');
+      expect(potluck.date).toBe('jan 1');
+      expect(potluck.time).toBe('1pm');
+      expect(potluck.location).toBe('3rd apple ln');
+    });
+    
+    test('responds with correct status and message sad path', async() => {
+      let result = await request(server)
+      .post('/api/potluck')
+      .send({date: 'mar 1'});
+      expect(result.status).toBe(400);
+      expect(result.body.message).toMatch(/missing required name/i);
+    });
+  });
 });

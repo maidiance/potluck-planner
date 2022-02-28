@@ -19,9 +19,9 @@ const validateId = (req, res, next) => {
 const validatePotluck = (req, res, next) => {
     const potluck = req.body;
     if(!potluck) {
-        res.status(500).json({message: 'missing required body'});
+        res.status(400).json({message: 'missing required body'});
     } else if (!potluck.name || !potluck.name.trim()) {
-        res.status(500).json({message: 'missing required name'});
+        res.status(400).json({message: 'missing required name'});
     } else {
         next();
     }
