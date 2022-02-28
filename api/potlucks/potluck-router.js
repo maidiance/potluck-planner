@@ -37,7 +37,7 @@ router.put('/:id', validateId, validatePotluck, (req, res) => {
 });
 
 router.delete('/:id', validateId, (req, res) => {
-    Potluck.delete(req.params.id)
+    Potluck.remove(req.params.id)
         .then(potluck => {
             res.status(200).json(potluck);
         })

@@ -48,7 +48,7 @@ async function update(potluck_id, changes) {
 async function remove(potluck_id) {
     const result = await findById(potluck_id);
     await db('potluck').where('pid', potluck_id).del();
-    return result;
+    return result[0];
 }
 
 function findItems(potluck_id) {

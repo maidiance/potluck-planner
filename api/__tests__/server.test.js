@@ -56,7 +56,7 @@ describe('test Potluck model', () => {
   });
 
   test('can delete potluck', async() => {
-    let [result] = await Potluck.remove(1);
+    let result = await Potluck.remove(1);
     expect(result.name).toBe('bobs birthday');
     expect(result.date).toBe('jan 1');
     expect(result.time).toBe('1pm');
@@ -193,6 +193,26 @@ describe('test potluck endpoints', () => {
         .send({date: 'feb 3'});
       expect(result.status).toBe(400);
       expect(result.body.message).toMatch(/missing required name/i);
+    });
+  });
+
+  describe('[DELETE] /api/potluck/:id', () => {
+    test('responds with correct status and body happy path', async() => {
+      let result = await request(server)
+        .del('/api/potluck/2');
+      expect(result.status).toBe(200);
+      let potluck = result.body;
+      expect(potluck.name).toBe('bobs birthday');
+      expect(potluck.date).toBe('feb 2');
+      expect(potluck.time).toBe('2pm');
+      expect(potluck.location).toBe('2nd cherry st');
+    });
+
+    test('responds with correct status and message sad path', async() => {
+      let result = await request(server)
+        .del('/api/potluck/13');
+      expect(result.status).toBe(404);
+      expect(result.body.message).toMatch(/potluck 13 not found/i);
     });
   });
 });
