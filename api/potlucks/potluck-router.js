@@ -26,7 +26,7 @@ router.post('/', validatePotluck, (req, res) => {
         })
 });
 
-router.put('/:id', validateId, (req, res) => {
+router.put('/:id', validateId, validatePotluck, (req, res) => {
     Potluck.update(req.params.id, req.body)
         .then(potluck => {
             res.status(200).json(potluck);

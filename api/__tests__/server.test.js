@@ -145,11 +145,11 @@ describe('test potluck endpoints', () => {
     });
   });
 
-  describe('[POST] /api/potluck/', () => {
+  describe('[POST] /api/potluck', () => {
     test('responds with correct status and body happy path', async() => {
       let result = await request(server)
-      .post('/api/potluck')
-      .send({name: 'bobs potluck', date: 'jan 1', time: '1pm', location: '3rd apple ln', user_id: 2});
+        .post('/api/potluck')
+        .send({name: 'bobs potluck', date: 'jan 1', time: '1pm', location: '3rd apple ln', user_id: 2});
       expect(result.status).toBe(201);
       let potluck = result.body;
       expect(potluck.name).toBe('bobs potluck');
@@ -160,8 +160,37 @@ describe('test potluck endpoints', () => {
     
     test('responds with correct status and message sad path', async() => {
       let result = await request(server)
-      .post('/api/potluck')
-      .send({date: 'mar 1'});
+        .post('/api/potluck')
+        .send({date: 'mar 1'});
+      expect(result.status).toBe(400);
+      expect(result.body.message).toMatch(/missing required name/i);
+    });
+  });
+
+  describe('[PUT] /api/potluck/:id', () => {
+    test('responds with correct status and body happy path', async() => {
+      let result = await request(server)
+        .put('/api/potluck/2')
+        .send({name: 'bobs birthday'});
+      let potluck = result.body;
+      expect(potluck.name).toBe('bobs birthday');
+      expect(potluck.date).toBe('feb 2');
+      expect(potluck.time).toBe('2pm');
+      expect(potluck.location).toBe('2nd cherry st');
+    });
+
+    test('responds with correct status and message with bad id', async() => {
+      let result = await request(server)
+        .put('/api/potluck/13')
+        .send({name: 'test'});
+      expect(result.status).toBe(404);
+      expect(result.body.message).toMatch(/potluck 13 not found/i);
+    });
+
+    test('responds with correct status and message with bad body', async() => {
+      let result = await request(server)
+        .put('/api/potluck/2')
+        .send({date: 'feb 3'});
       expect(result.status).toBe(400);
       expect(result.body.message).toMatch(/missing required name/i);
     });
