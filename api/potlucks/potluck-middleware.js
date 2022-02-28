@@ -1,4 +1,5 @@
 const Potlucks = require('./potluck-model');
+const Users = require('../users/user-model');
 
 const validateId = (req, res, next) => {
     const id = req.params.id;
@@ -42,9 +43,16 @@ const validateItemId = (req, res, next) => {
         })
 }
 
-const validateItem = (req, res, next) => {
+const validateItem = async (req, res, next) => {
     if(!req.body.name || !req.body.name.trim()){
         res.status(400).json({message: 'missing required name'});
+    } else if(req.body.responsible != null) {
+        const result = await Users.findById(req.body.responsible);
+        if(!result) {
+            res.status(400).json({message: 'invalid user'});
+        } else {
+            next();
+        }
     } else {
         next();
     }

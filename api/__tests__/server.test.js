@@ -100,7 +100,7 @@ describe('test Potluck model', () => {
 
 describe('test users endpoints', () => {
   describe('[POST] /api/users/register', () => {
-    test('responds with a correct status and user is added to database', async() => {
+    test('responds with a correct status and user is added properly to database', async() => {
       let result = await request(server)
         .post('/api/users/register')
         .send({username: 'leaf', password: 'spring'});
@@ -160,7 +160,7 @@ describe('test potluck endpoints', () => {
   });
 
   describe('[GET] /api/potluck/:id', () => {
-    test('responds with correct status and body with good id', async() => {
+    test('responds with correct status and body happy path', async() => {
       let result = await request(server)
         .get('/api/potluck/2');
       expect(result.status).toBe(200);
@@ -171,7 +171,7 @@ describe('test potluck endpoints', () => {
       expect(potluck.location).toBe('2nd cherry st');
     });
 
-    test('responds with correct status and body with bad id', async() => {
+    test('responds with correct status and body sad path', async() => {
       let result = await request(server)
         .get('/api/potluck/3');
       expect(result.status).toBe(404);
@@ -213,7 +213,7 @@ describe('test potluck endpoints', () => {
       expect(potluck.location).toBe('2nd cherry st');
     });
 
-    test('responds with correct status and message with bad id', async() => {
+    test('responds with correct status and message sad path', async() => {
       let result = await request(server)
         .put('/api/potluck/13')
         .send({name: 'test'});
@@ -321,6 +321,40 @@ describe('test items endpoints', () => {
         .send({name: ''});
       expect(result.status).toBe(400);
       expect(result.body.message).toMatch(/missing required name/i);
+    });
+
+    test('responds correctly when valid update responsible user', async() => {
+      let result = await request(server)
+        .put('/api/potluck/3/items/5')
+        .send({name: 'foobar', responsible: 2});
+      expect(result.status).toBe(200);
+      let item = result.body;
+      expect(item.responsible).toBe(2);
+    })
+
+    test('responds correctly when invalid update responsible user', async() => {
+      let result = await request(server)
+        .put('/api/potluck/3/items/5')
+        .send({name: 'none', responsible: 13});
+      expect(result.status).toBe(400);
+      expect(result.body.message).toMatch(/invalid user/i);
+    })
+  });
+
+  describe('[DELETE] /:id/items/:item_id', () => {
+    test('responds with correct status and body happy path', async() => {
+      let result = await request(server)
+        .del('/api/potluck/3/items/5');
+      expect(result.status).toBe(200);
+      let item = result.body;
+      expect(item.name).toBe('foobar');
+    });
+
+    test('responds with correct status and message sad path', async() => {
+      let result = await request(server)
+        .del('/api/potluck/3/items/15');
+      expect(result.status).toBe(404);
+      expect(result.body.message).toMatch(/item 15 not found/i);
     });
   });
 });

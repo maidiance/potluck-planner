@@ -79,4 +79,15 @@ router.put('/:id/items/:item_id', validateId, validateItemId, validateItem, (req
         })
 });
 
+router.delete('/:id/items/:item_id', validateId, validateItemId, (req, res) => {
+    const {item_id} = req.params;
+    Potluck.removeItem(item_id)
+        .then(item => {
+            res.status(200).json(item);
+        })
+        .catch(() => {
+            res.status(500).json({message: 'could not delete item'});
+        })
+});
+
 module.exports = router;
