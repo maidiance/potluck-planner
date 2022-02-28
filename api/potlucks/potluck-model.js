@@ -9,7 +9,8 @@ module.exports = {
     remove,
     findItems,
     insertItem,
-    updateItem
+    updateItem,
+    removeItem
 };
 
 function find() {

@@ -90,7 +90,12 @@ describe('test Potluck model', () => {
   test('can update responsible', async() => {
     let result = await Potluck.updateItem(1, {responsible: 1});
     expect(result.responsible).toBe(1);
-  })
+  });
+
+  test('can delete item from potluck', async() => {
+    let result = await Potluck.removeItem(1);
+    expect(result.name).toBe('dip');
+  });
 });
 
 describe('test users endpoints', () => {
@@ -247,18 +252,17 @@ describe('test potluck endpoints', () => {
 });
 
 describe('test items endpoints', () => {
-  // describe('[POST] /:id/items', () => {
-  //   test('responds with correct status and body happy path', async() => {
-  //     let result = await request(server)
-  //       .post('/api/potluck/3/items')
-  //       .send({name: 'chips'});
-  //     console.log('post test', result.message);
-  //     expect(result.status).toBe(201);
-  //     let items = result.body;
-  //     expect(items).toHaveLength(1);
-  //     expect(items[0].name).toBe('chips');
-  //   });
-  // });
+  describe('[POST] /:id/items', () => {
+    test('responds with correct status and body happy path', async() => {
+      let result = await request(server)
+        .post('/api/potluck/3/items')
+        .send({name: 'chips'});
+      console.log('post test', result.message);
+      expect(result.status).toBe(201);
+      let item = result.body;
+      expect(item.name).toBe('chips');
+    });
+  });
 
   // describe('[GET] /:id/items', () => {
   //   test('responds with correct status and body happy path', async() => {
