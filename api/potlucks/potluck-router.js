@@ -60,7 +60,7 @@ router.get('/:id/items', validateId, (req, res) => {
 router.post('/:id/items', validateId, validateItem, (req, res) => {
     const { id } = req.params;
     Potluck.insertItem(id, req.body)
-        .them(item => {
+        .then(item => {
             res.status(201).json(item);
         })
         .catch(() => {

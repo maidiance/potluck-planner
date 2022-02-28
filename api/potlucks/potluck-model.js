@@ -53,29 +53,23 @@ async function remove(potluck_id) {
 
 function findItems(potluck_id) {
     return db('org as o')
-        .join('items as i', 'i.item_id', 'p.pid')
+        .leftJoin('items as i', 'i.item_id', 'o.pid')
         .select('i.name')
-        .where('p.pid', potluck_id);
+        .where('o.pid', potluck_id);
 }
 
-function findItemById(potluck_id) {
+function findItemById(item_id) {
     return db('items')
-        .where('item_id', potluck_id);
+        .where('item_id', item_id);
 }
 
 async function insertItem(potluck_id, item) {
-    const toInsert = {
-        pid: potluck_id,
-        item_id: item.item_id
-    };
-    await db('org')
-        .insert(toInsert)
-        .where('pid', potluck_id)
-    return db('items')
-        .insert(item)
-        .then(([id]) => {
-            return findItemById(id);
-        })
+    let [newItem] = await db('items').insert(item, ['item_id', 'name']);
+    let toInsert = {pid: potluck_id, item_id: newItem.item_id};
+    // let inserted = await db('org')
+    //     .insert(toInsert);
+    // console.log('insertItem', inserted);
+    return newItem;
 }
 
 async function updateItem(item_id, changes) {

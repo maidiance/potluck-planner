@@ -62,6 +62,16 @@ describe('test Potluck model', () => {
     expect(result.time).toBe('1pm');
     expect(result.location).toBe('3rd apple ln');
   });
+
+  test('can add items by potluck id', async() => {
+    let result = await Potluck.insertItem(2, {name: 'salsa'});
+    expect(result.name).toBe('salsa');
+  });
+
+  test('can get items by potluck id', async() => {
+    let result = await Potluck.findItems(2);
+    console.log(result);
+  });
 });
 
 describe('test users endpoints', () => {
@@ -215,4 +225,31 @@ describe('test potluck endpoints', () => {
       expect(result.body.message).toMatch(/potluck 13 not found/i);
     });
   });
+});
+
+describe('test items endpoints', () => {
+  // describe('[POST] /:id/items', () => {
+  //   test('responds with correct status and body happy path', async() => {
+  //     let result = await request(server)
+  //       .post('/api/potluck/3/items')
+  //       .send({name: 'chips'});
+  //     console.log('post test', result.message);
+  //     expect(result.status).toBe(201);
+  //     let items = result.body;
+  //     expect(items).toHaveLength(1);
+  //     expect(items[0].name).toBe('chips');
+  //   });
+  // });
+
+  // describe('[GET] /:id/items', () => {
+  //   test('responds with correct status and body happy path', async() => {
+  //     let result = await request(server)
+  //       .get('/api/potluck/3/items');
+  //     // console.log('get test', result.message);
+  //     expect(result.status).toBe(200);
+  //     let items = result.body;
+  //     expect(items).toHaveLength(1);
+  //     expect(items[0].name).toBe('chips');
+  //   });
+  // });
 });
