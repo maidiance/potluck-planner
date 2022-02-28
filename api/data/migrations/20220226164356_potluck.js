@@ -19,18 +19,21 @@ exports.up = function(knex) {
         .createTable('items', tbl => {
             tbl.increments('item_id');
             tbl.string('name').notNullable();
+            tbl.integer('responsible');
         })
         .createTable('org', tbl => {
             tbl.integer('pid')
                 .unsigned()
                 .notNullable()
                 .references('pid')
-                .inTable('potluck');
+                .inTable('potluck')
+                .onDelete('CASCADE');
             tbl.integer('item_id')
                 .unsigned()
                 .notNullable()
                 .references('item_id')
-                .inTable('items');
+                .inTable('items')
+                .onDelete('CASCADE');
             tbl.primary(['pid', 'item_id']);
         })
 };

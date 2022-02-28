@@ -70,7 +70,6 @@ describe('test Potluck model', () => {
 
   test('can get items by potluck id', async() => {
     let result = await Potluck.findItems(2);
-    console.log(result);
   });
 });
 

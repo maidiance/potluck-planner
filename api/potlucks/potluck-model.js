@@ -66,9 +66,7 @@ function findItemById(item_id) {
 async function insertItem(potluck_id, item) {
     let [newItem] = await db('items').insert(item, ['item_id', 'name']);
     let toInsert = {pid: potluck_id, item_id: newItem.item_id};
-    // let inserted = await db('org')
-    //     .insert(toInsert);
-    // console.log('insertItem', inserted);
+    await db('org').insert(toInsert, ['pid', 'item_id']);
     return newItem;
 }
 
