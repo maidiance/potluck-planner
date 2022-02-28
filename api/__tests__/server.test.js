@@ -257,22 +257,36 @@ describe('test items endpoints', () => {
       let result = await request(server)
         .post('/api/potluck/3/items')
         .send({name: 'chips'});
-      console.log('post test', result.message);
       expect(result.status).toBe(201);
       let item = result.body;
       expect(item.name).toBe('chips');
     });
+
+    test('responds with correct status and message sad path', async() => {
+      let result = await request(server)
+        .post('/api/potluck/13/items')
+        .send({name: 'none'});
+      expect(result.status).toBe(404);
+      expect(result.body.message).toMatch(/potluck 13 not found/i);
+    });
+
+    test('responds with correct status and message with bad body', async() => {
+      let result = await request(server)
+        .post('/api/potluck/3/items')
+        .send({name: ''});
+      expect(result.status).toBe(400);
+      expect(result.body.message).toMatch(/missing required name/i);
+    });
   });
 
-  // describe('[GET] /:id/items', () => {
-  //   test('responds with correct status and body happy path', async() => {
-  //     let result = await request(server)
-  //       .get('/api/potluck/3/items');
-  //     // console.log('get test', result.message);
-  //     expect(result.status).toBe(200);
-  //     let items = result.body;
-  //     expect(items).toHaveLength(1);
-  //     expect(items[0].name).toBe('chips');
-  //   });
-  // });
+  describe('[GET] /:id/items', () => {
+    test('responds with correct status and body happy path', async() => {
+      let result = await request(server)
+        .get('/api/potluck/3/items');
+      expect(result.status).toBe(200);
+      let items = result.body;
+      expect(items).toHaveLength(1);
+      expect(items[0].name).toBe('chips');
+    });
+  });
 });
