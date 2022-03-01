@@ -14,6 +14,7 @@ server.use(cors());
 server.use('/api/users', usersRouter);
 server.use('/api/potluck', potluckRouter);
 server.param('id', (req, res, next, id) => {
+    // we need this to pass in the id for the itemsRouter
     req.id = id;
     next();
 });

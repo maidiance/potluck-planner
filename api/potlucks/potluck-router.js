@@ -49,8 +49,35 @@ router.delete('/:id', restricted, validateId, (req, res) => {
 });
 
 // Attending routes
-router.get('/:id/attend/:user_id', validateId, validateUserId, (req, res) => {
-    
+router.get('/:id/attend', validateId, (req, res) => {
+    Potluck.getAttendsByPotluck(req.params.id)
+        .then(users => {
+            res.status(200).json(users);
+        })
+        .catch(() => {
+            res.status(500).json({message: 'could not get attendees'});
+        })
+});
+
+router.post('/:id/attend', validateId, validateUserId, (req, res) => {
+    const {user_id} = req.body;
+    Potluck.addAttend(req.params.id, user_id)
+        .then(users => {
+            res.status(201).json(users);
+        })
+        .catch(() => {
+            res.status(500).json({message: 'could not post attendee'});
+        })
+});
+
+router.delete('/:id/attend/:user_id', validateId, validateUserId, (req, res) => {
+    Potluck.delAttend(req.params.id, req.params.user_id)
+        .then(user => {
+            res.status(200).json(user);
+        })
+        .catch(() => {
+            res.status(500).json({message: 'could not delete attendee'});
+        })
 });
 
 module.exports = router;

@@ -312,6 +312,39 @@ describe('test potluck endpoints', () => {
   });
 });
 
+describe('test potluck attends endpoints', () => {
+  describe('[GET] /api/potluck/:id/attend', () => {
+    test('responds with correct status and body happy path', async() => {
+      let result = await request(server)
+        .get('/api/potluck/3/attend');
+      expect(result.status).toBe(200);
+      expect(result.body).toBeInstanceOf(Array);
+      expect(result.body).toHaveLength(0);
+    });
+  });
+  
+  describe('[POST] /api/potluck/:id/attend', () => {
+    test('responds with correct status and body happy path', async() => {
+      let result = await request(server)
+        .post('/api/potluck/3/attend')
+        .send({user_id: 1, username: 'test'});
+      expect(result.status).toBe(201);
+      expect(result.body).toBeInstanceOf(Array);
+      expect(result.body).toHaveLength(1);
+      expect(result.body[0].username).toBe('test');
+    });
+  });
+
+  describe('[DELETE] /api/potluck/:id/attend/:user_id', () => {
+    test('responds with correct status and body happy path', async() => {
+      let result = await request(server)
+        .del('/api/potluck/3/attend/1');
+      expect(result.status).toBe(200);
+      expect(result.body.username).toBe('test');
+    });
+  });
+});
+
 describe('test items endpoints', () => {
   describe('[POST] /api/potluck/:id/items', () => {
     test('responds with correct status no user', async() => {
