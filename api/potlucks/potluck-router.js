@@ -1,7 +1,9 @@
 const router = require('express').Router();
 const Potluck = require('./potluck-model');
-const { restricted, validateId, validatePotluck, validateItem, validateItemId } = require('./potluck-middleware');
+const { restricted, validateId, validatePotluck } = require('./potluck-middleware');
+const { validateUserId } = require('./../users/user-middleware');
 
+// Potluck routes
 router.get('/', (req, res) => {
     Potluck.find()
         .then(potlucks => {
@@ -46,48 +48,9 @@ router.delete('/:id', restricted, validateId, (req, res) => {
         })
 });
 
-router.get('/:id/items', validateId, (req, res) => {
-    const { id } = req.params;
-    Potluck.findItems(id)
-        .then(items => {
-            res.status(200).json(items);
-        })
-        .catch(() => {
-            res.status(500).json({message: 'could not get items'});
-        })
-});
-
-router.post('/:id/items', validateId, validateItem, (req, res) => {
-    const { id } = req.params;
-    Potluck.insertItem(id, req.body)
-        .then(item => {
-            res.status(201).json(item);
-        })
-        .catch(() => {
-            res.status(500).json({message: 'could not post item'});
-        })
-});
-
-router.put('/:id/items/:item_id', restricted, validateId, validateItemId, validateItem, (req, res) => {
-    const {item_id} = req.params;
-    Potluck.updateItem(item_id, req.body)
-        .then(item => {
-            res.status(200).json(item);
-        })
-        .catch(() => {
-            res.status(500).json({message: 'could not put item'});
-        })
-});
-
-router.delete('/:id/items/:item_id', restricted, validateId, validateItemId, (req, res) => {
-    const {item_id} = req.params;
-    Potluck.removeItem(item_id)
-        .then(item => {
-            res.status(200).json(item);
-        })
-        .catch(() => {
-            res.status(500).json({message: 'could not delete item'});
-        })
+// Attending routes
+router.get('/:id/attend/:user_id', validateId, validateUserId, (req, res) => {
+    
 });
 
 module.exports = router;

@@ -3,6 +3,7 @@ const server = require('../server');
 const db = require('./../data/db-config');
 const Users = require('./../users/user-model');
 const Potluck = require('./../potlucks/potluck-model');
+const Items = require('./../items/item-model');
 
 beforeAll(async () => {
   await db.migrate.rollback();
@@ -63,38 +64,40 @@ describe('test Potluck model', () => {
     expect(result.time).toBe('1pm');
     expect(result.location).toBe('3rd apple ln');
   });
+});
 
+describe('test Items model', () => {
   test('can add items by potluck id', async() => {
-    let result = await Potluck.insertItem(2, {name: 'salsa'});
+    let result = await Items.insert(2, {name: 'salsa'});
     expect(result.name).toBe('salsa');
   });
 
   test('can get items by potluck id', async() => {
-    let result = await Potluck.findItems(2);
+    let result = await Items.find(2);
     expect(result.length).toBe(1);
     expect(result[0].name).toBe('salsa');
   });
 
-  test('can get items after multiple inserts', async() => {
-    await Potluck.insertItem(2, {name: 'chips'});
-    await Potluck.insertItem(2, {name: 'pizza'});
-    await Potluck.insertItem(2, {name: 'drinks'});
-    let result = await Potluck.findItems(2);
-    expect(result.length).toBe(4);
+  test('can get item by item id', async() => {
+    await Items.insert(2, {name: 'chips'});
+    await Items.insert(2, {name: 'pizza'});
+    await Items.insert(2, {name: 'drinks'});
+    let result = await Items.findById(2);
+    expect(result.name).toBe('chips');
   });
 
   test('can update item name', async() => {
-    let result = await Potluck.updateItem(1, {name: 'dip'});
+    let result = await Items.update(1, {name: 'dip'});
     expect(result.name).toBe('dip');
   });
 
   test('can update responsible', async() => {
-    let result = await Potluck.updateItem(1, {responsible: 1});
+    let result = await Items.update(1, {responsible: 1});
     expect(result.responsible).toBe(1);
   });
 
   test('can delete item from potluck', async() => {
-    let result = await Potluck.removeItem(1);
+    let result = await Items.remove(1);
     expect(result.name).toBe('dip');
   });
 });
@@ -310,7 +313,7 @@ describe('test potluck endpoints', () => {
 });
 
 describe('test items endpoints', () => {
-  describe('[POST] /:id/items', () => {
+  describe('[POST] /api/potluck/:id/items', () => {
     test('responds with correct status no user', async() => {
       let result = await request(server)
         .post('/api/potluck/3/items')
