@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const Potluck = require('./potluck-model');
-const { validateId, validatePotluck, validateItem, validateItemId } = require('./potluck-middleware');
+const { restricted, validateId, validatePotluck, validateItem, validateItemId } = require('./potluck-middleware');
 
 router.get('/', (req, res) => {
     Potluck.find()
@@ -16,7 +16,7 @@ router.get('/:id', validateId, (req, res) => {
     res.json(req.potluck);
 });
 
-router.post('/', validatePotluck, (req, res) => {
+router.post('/', restricted, validatePotluck, (req, res) => {
     Potluck.insert(req.body)
         .then(potluck => {
             res.status(201).json(potluck);
@@ -26,7 +26,7 @@ router.post('/', validatePotluck, (req, res) => {
         })
 });
 
-router.put('/:id', validateId, validatePotluck, (req, res) => {
+router.put('/:id', restricted, validateId, validatePotluck, (req, res) => {
     Potluck.update(req.params.id, req.body)
         .then(potluck => {
             res.status(200).json(potluck);
@@ -36,7 +36,7 @@ router.put('/:id', validateId, validatePotluck, (req, res) => {
         })
 });
 
-router.delete('/:id', validateId, (req, res) => {
+router.delete('/:id', restricted, validateId, (req, res) => {
     Potluck.remove(req.params.id)
         .then(potluck => {
             res.status(200).json(potluck);
@@ -68,7 +68,7 @@ router.post('/:id/items', validateId, validateItem, (req, res) => {
         })
 });
 
-router.put('/:id/items/:item_id', validateId, validateItemId, validateItem, (req, res) => {
+router.put('/:id/items/:item_id', restricted, validateId, validateItemId, validateItem, (req, res) => {
     const {item_id} = req.params;
     Potluck.updateItem(item_id, req.body)
         .then(item => {
@@ -79,7 +79,7 @@ router.put('/:id/items/:item_id', validateId, validateItemId, validateItem, (req
         })
 });
 
-router.delete('/:id/items/:item_id', validateId, validateItemId, (req, res) => {
+router.delete('/:id/items/:item_id', restricted, validateId, validateItemId, (req, res) => {
     const {item_id} = req.params;
     Potluck.removeItem(item_id)
         .then(item => {

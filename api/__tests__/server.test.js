@@ -8,6 +8,7 @@ beforeAll(async () => {
   await db.migrate.rollback();
   await db.migrate.latest();
 });
+
 afterAll(async () => {
   await db.destroy();
 });
@@ -183,9 +184,23 @@ describe('test potluck endpoints', () => {
   });
 
   describe('[POST] /api/potluck', () => {
-    test('responds with correct status and body happy path', async() => {
+    test('responds with correct status and message no user', async() => {
       let result = await request(server)
         .post('/api/potluck')
+        .send({name: 'none'});
+      expect(result.status).toBe(401);
+      expect(result.body.message).toMatch(/token required/i);
+    });
+    test('responds with correct status and body happy path', async() => {
+      await request(server)
+        .post('/api/users/register')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
+      let login = await request(server)
+        .post('/api/users/login')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
+      let result = await request(server)
+        .post('/api/potluck')
+        .set('Authorization', login.body.token)
         .send({name: 'bobs potluck', date: 'jan 1', time: '1pm', location: '3rd apple ln', user_id: 2});
       expect(result.status).toBe(201);
       let potluck = result.body;
@@ -197,8 +212,12 @@ describe('test potluck endpoints', () => {
     });
     
     test('responds with correct status and message sad path', async() => {
+      let login = await request(server)
+        .post('/api/users/login')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
       let result = await request(server)
         .post('/api/potluck')
+        .set('Authorization', login.body.token)
         .send({date: 'mar 1'});
       expect(result.status).toBe(400);
       expect(result.body.message).toMatch(/missing required name/i);
@@ -206,9 +225,20 @@ describe('test potluck endpoints', () => {
   });
 
   describe('[PUT] /api/potluck/:id', () => {
-    test('responds with correct status and body happy path', async() => {
+    test('responds with correct status and message no user', async() => {
       let result = await request(server)
         .put('/api/potluck/2')
+        .send({name: 'none'});
+      expect(result.status).toBe(401);
+      expect(result.body.message).toMatch(/token required/i);
+    });
+    test('responds with correct status and body happy path', async() => {
+      let login = await request(server)
+        .post('/api/users/login')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
+      let result = await request(server)
+        .put('/api/potluck/2')
+        .set('Authorization', login.body.token)
         .send({name: 'bobs birthday'});
       let potluck = result.body;
       expect(potluck.pid).toBe(2);
@@ -219,16 +249,24 @@ describe('test potluck endpoints', () => {
     });
 
     test('responds with correct status and message sad path', async() => {
+      let login = await request(server)
+        .post('/api/users/login')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
       let result = await request(server)
         .put('/api/potluck/13')
+        .set('Authorization', login.body.token)
         .send({name: 'test'});
       expect(result.status).toBe(404);
       expect(result.body.message).toMatch(/potluck 13 not found/i);
     });
 
     test('responds with correct status and message with bad body', async() => {
+      let login = await request(server)
+        .post('/api/users/login')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
       let result = await request(server)
         .put('/api/potluck/2')
+        .set('Authorization', login.body.token)
         .send({date: 'feb 3'});
       expect(result.status).toBe(400);
       expect(result.body.message).toMatch(/missing required name/i);
@@ -236,9 +274,19 @@ describe('test potluck endpoints', () => {
   });
 
   describe('[DELETE] /api/potluck/:id', () => {
-    test('responds with correct status and body happy path', async() => {
+    test('responds with correct status and message no user', async() => {
       let result = await request(server)
         .del('/api/potluck/2');
+      expect(result.status).toBe(401);
+      expect(result.body.message).toMatch(/token required/i);
+    });
+    test('responds with correct status and body happy path', async() => {
+      let login = await request(server)
+        .post('/api/users/login')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
+      let result = await request(server)
+        .del('/api/potluck/2')
+        .set('Authorization', login.body.token);
       expect(result.status).toBe(200);
       let potluck = result.body;
       expect(potluck.pid).toBe(2);
@@ -249,8 +297,12 @@ describe('test potluck endpoints', () => {
     });
 
     test('responds with correct status and message sad path', async() => {
+      let login = await request(server)
+        .post('/api/users/login')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
       let result = await request(server)
-        .del('/api/potluck/13');
+        .del('/api/potluck/13')
+        .set('Authorization', login.body.token);
       expect(result.status).toBe(404);
       expect(result.body.message).toMatch(/potluck 13 not found/i);
     });
@@ -259,13 +311,20 @@ describe('test potluck endpoints', () => {
 
 describe('test items endpoints', () => {
   describe('[POST] /:id/items', () => {
+    test('responds with correct status no user', async() => {
+      let result = await request(server)
+        .post('/api/potluck/3/items')
+        .send({name: 'none'});
+      expect(result.status).toBe(201);
+    });
+
     test('responds with correct status and body happy path', async() => {
       let result = await request(server)
         .post('/api/potluck/3/items')
         .send({name: 'chips'});
       expect(result.status).toBe(201);
       let item = result.body;
-      expect(item.item_id).toBe(5);
+      expect(item.item_id).toBe(6);
       expect(item.name).toBe('chips');
     });
 
@@ -292,8 +351,8 @@ describe('test items endpoints', () => {
         .get('/api/potluck/3/items');
       expect(result.status).toBe(200);
       let items = result.body;
-      expect(items).toHaveLength(1);
-      expect(items[0].name).toBe('chips');
+      expect(items).toHaveLength(2);
+      expect(items[1].name).toBe('chips');
     });
 
     test('responds with correct status and message sad path', async() => {
@@ -305,9 +364,21 @@ describe('test items endpoints', () => {
   });
 
   describe('[PUT] /:id/items/:item_id', () => {
-    test('responds with correct status and body happy path', async() => {
+    test('responds with correct status and message no user', async() => {
       let result = await request(server)
         .put('/api/potluck/3/items/5')
+        .send({name: 'none'});
+      expect(result.status).toBe(401);
+      expect(result.body.message).toBe('token required');
+    });
+
+    test('responds with correct status and body happy path', async() => {
+      let login = await request(server)
+        .post('/api/users/login')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
+      let result = await request(server)
+        .put('/api/potluck/3/items/5')
+        .set('Authorization', login.body.token)
         .send({name: 'foobar'});
       expect(result.status).toBe(200);
       let item = result.body;
@@ -316,24 +387,36 @@ describe('test items endpoints', () => {
     });
 
     test('responds with correct status and message sad path', async() => {
+      let login = await request(server)
+        .post('/api/users/login')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
       let result = await request(server)
         .put('/api/potluck/3/items/15')
+        .set('Authorization', login.body.token)
         .send({name: 'none'});
       expect(result.status).toBe(404);
       expect(result.body.message).toMatch(/item 15 not found/i);
     });
 
     test('responds with correct status and message with bad body', async() => {
+      let login = await request(server)
+        .post('/api/users/login')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
       let result = await request(server)
         .put('/api/potluck/3/items/5')
+        .set('Authorization', login.body.token)
         .send({name: ''});
       expect(result.status).toBe(400);
       expect(result.body.message).toMatch(/missing required name/i);
     });
 
     test('responds correctly when valid update responsible user', async() => {
+      let login = await request(server)
+        .post('/api/users/login')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
       let result = await request(server)
         .put('/api/potluck/3/items/5')
+        .set('Authorization', login.body.token)
         .send({name: 'foobar', responsible: 2});
       expect(result.status).toBe(200);
       let item = result.body;
@@ -341,8 +424,12 @@ describe('test items endpoints', () => {
     });
 
     test('responds correctly when invalid update responsible user', async() => {
+      let login = await request(server)
+        .post('/api/users/login')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
       let result = await request(server)
         .put('/api/potluck/3/items/5')
+        .set('Authorization', login.body.token)
         .send({name: 'none', responsible: 13});
       expect(result.status).toBe(400);
       expect(result.body.message).toMatch(/invalid user/i);
@@ -350,17 +437,32 @@ describe('test items endpoints', () => {
   });
 
   describe('[DELETE] /:id/items/:item_id', () => {
-    test('responds with correct status and body happy path', async() => {
+    test('responds with correct status and message no user', async() => {
       let result = await request(server)
         .del('/api/potluck/3/items/5');
+      expect(result.status).toBe(401);
+      expect(result.body.message).toBe('token required');
+    });
+
+    test('responds with correct status and body happy path', async() => {
+      let login = await request(server)
+        .post('/api/users/login')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
+      let result = await request(server)
+        .del('/api/potluck/3/items/5')
+        .set('Authorization', login.body.token);
       expect(result.status).toBe(200);
       let item = result.body;
       expect(item.name).toBe('foobar');
     });
 
     test('responds with correct status and message sad path', async() => {
+      let login = await request(server)
+        .post('/api/users/login')
+        .send({ username: 'Captain Marvel', password: 'foobar' });
       let result = await request(server)
-        .del('/api/potluck/3/items/15');
+        .del('/api/potluck/3/items/15')
+        .set('Authorization', login.body.token);
       expect(result.status).toBe(404);
       expect(result.body.message).toMatch(/item 15 not found/i);
     });

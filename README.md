@@ -4,6 +4,8 @@
 ### Register
 **Registers a new user** <br/>
 `[POST] /api/users/register`
+Limits: <br/>
+* name: 200 characters<br />
 > Expected body format:
 ```
   {

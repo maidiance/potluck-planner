@@ -14,14 +14,31 @@ exports.up = function(knex) {
                 .unsigned()
                 .notNullable()
                 .references('user_id')
-                .inTable('users');
+                .inTable('users')
+                .onDelete('CASCADE');
         })
         .createTable('items', tbl => {
             tbl.increments('item_id');
             tbl.string('name', 128).notNullable();
             tbl.integer('responsible')
                 .references('user_id')
-                .inTable('users');
+                .inTable('users')
+                .onDelete('CASCADE');
+        })
+        .createTable('attending', tbl => {
+            tbl.integer('user_id')
+                .unsigned()
+                .notNullable()
+                .references('user_id')
+                .inTable('users')
+                .onDelete('CASCADE');
+            tbl.integer('pid')
+                .unsigned()
+                .notNullable()
+                .references('pid')
+                .inTable('potluck')
+                .onDelete('CASCADE');
+            tbl.primary(['pid', 'user_id']);
         })
         .createTable('org', tbl => {
             tbl.integer('pid')
@@ -47,6 +64,7 @@ exports.up = function(knex) {
 exports.down = function(knex) {
     return knex.schema
         .dropTableIfExists('org')
+        .dropTableIfExists('attending')
         .dropTableIfExists('items')
         .dropTableIfExists('potluck');
 };
