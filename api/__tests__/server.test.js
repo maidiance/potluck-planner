@@ -197,10 +197,10 @@ describe('test potluck endpoints', () => {
     test('responds with correct status and body happy path', async() => {
       await request(server)
         .post('/api/users/register')
-        .send({ username: 'Captain Marvel', password: 'foobar' });
+        .send({ username: 'Astrocat', password: 'foobar' });
       let login = await request(server)
         .post('/api/users/login')
-        .send({ username: 'Captain Marvel', password: 'foobar' });
+        .send({ username: 'Astrocat', password: 'foobar' });
       let result = await request(server)
         .post('/api/potluck')
         .set('Authorization', login.body.token)
@@ -321,6 +321,13 @@ describe('test potluck attends endpoints', () => {
       expect(result.body).toBeInstanceOf(Array);
       expect(result.body).toHaveLength(0);
     });
+
+    test('responds with correct status and message sad path', async() => {
+      let result = await request(server)
+        .get('/api/potluck/13/attend');
+      expect(result.status).toBe(404);
+      expect(result.body.message).toMatch(/potluck 13 not found/i);
+    });
   });
   
   describe('[POST] /api/potluck/:id/attend', () => {
@@ -333,6 +340,22 @@ describe('test potluck attends endpoints', () => {
       expect(result.body).toHaveLength(1);
       expect(result.body[0].username).toBe('test');
     });
+
+    test('responds with correct status and message sad path', async() => {
+      let result = await request(server)
+        .post('/api/potluck/13/attend')
+        .send({user_id: 1, username: 'test'});
+      expect(result.status).toBe(404);
+      expect(result.body.message).toMatch(/potluck 13 not found/i);
+    });
+
+    test('respond with correct status and message bad body', async() => {
+      let result = await request(server)
+        .post('/api/potluck/3/attend')
+        .send({user_id: 13, username: 'none'});
+      expect(result.status).toBe(401);
+      expect(result.body.message).toMatch(/invalid user/i);
+    });
   });
 
   describe('[DELETE] /api/potluck/:id/attend/:user_id', () => {
@@ -341,6 +364,13 @@ describe('test potluck attends endpoints', () => {
         .del('/api/potluck/3/attend/1');
       expect(result.status).toBe(200);
       expect(result.body.username).toBe('test');
+    });
+
+    test('responds with correct status and message sad path', async() => {
+      let result = await request(server)
+        .del('/api/potluck/3/attend/13');
+      expect(result.status).toBe(404);
+      expect(result.body.message).toMatch(/user 13 not found/i);
     });
   });
 });

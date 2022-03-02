@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const Potluck = require('./potluck-model');
 const { restricted, validateId, validatePotluck } = require('./potluck-middleware');
-const { validateUserId } = require('./../users/user-middleware');
+const { validateUserId, validateUsername } = require('./../users/user-middleware');
 
 // Potluck routes
 router.get('/', (req, res) => {
@@ -59,7 +59,7 @@ router.get('/:id/attend', validateId, (req, res) => {
         })
 });
 
-router.post('/:id/attend', validateId, validateUserId, (req, res) => {
+router.post('/:id/attend', validateId, validateUsername, validateUserId, (req, res) => {
     const {user_id} = req.body;
     Potluck.addAttend(req.params.id, user_id)
         .then(users => {
