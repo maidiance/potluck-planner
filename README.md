@@ -141,6 +141,59 @@ Limits: <br/>
   }
 ```
 
+## Attend
+### [GET]
+**Get users attending a potluck by id** <br/>
+`[GET] /api/potluck/:id/attend`
+> Expected return format:
+```
+  [
+    {
+      user_id: 1,
+      username: 'bob'
+    },
+    {
+      ...
+    },
+    ...
+  ]
+```
+
+### [POST]
+**Add a user to a potluck** <br/>
+`[POST] /api/potluck/:id/attend`
+> Expected body format:
+```
+  {
+    user_id: 1,
+    username: 'bob'
+  }
+```
+> Expected return format:
+```
+  [
+    {
+      user_id: 1,
+      username: 'bob'
+    },
+    {
+      ...
+    },
+    ...
+  ]
+```
+
+### [DELETE]
+**Remove a user from a potluck** <br/>
+`[DELETE] /api/potluck/:id/attend/:user_id`
+> Expected return format:
+```
+  {
+    user_id: 1,
+    username: 'bob'
+  }
+```
+
 ## Items
 ### [GET]
 **Get items for a potluck id** <br/>
